@@ -7,6 +7,9 @@ class HomeAndroid extends StatefulWidget {
 }
 
 class _HomeAndroidState extends State<HomeAndroid> {
+  String _nome = 'Seu Nome';
+  double _altura = 1.75;
+  double _peso = 70.0;
   double waterPercentage = 50;
 
   @override
@@ -31,15 +34,39 @@ class _HomeAndroidState extends State<HomeAndroid> {
                 ),
               ),
               SizedBox(height: 16),
-              _buildTextField('Nome'),
+              _buildTextField('Nome', _nome),
               SizedBox(height: 8),
-              _buildTextField('Altura'),
+              _buildTextField('Altura', _altura.toString()),
               SizedBox(height: 8),
-              _buildTextField('Peso'),
+              _buildTextField('Peso', _peso.toString()),
               SizedBox(height: 32),
               _buildPercentageIndicator(),
               SizedBox(height: 32),
               _buildBarChart(),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  final result = await Navigator.pushNamed(
+                    context,
+                    '/edit',
+                    arguments: {
+                      'nome': _nome,
+                      'altura': _altura,
+                      'peso': _peso,
+                    },
+                  );
+                  if (result != null) {
+                    setState(() {
+                      var data = result as 
+                  Map<String, dynamic>;
+                      _nome = data['nome'];
+                      _altura = data['altura'];
+                      _peso = data['peso'];
+                    });
+                  }
+                },
+                child: Text('Editar Informações'),
+              ),
             ],
           ),
         ),
@@ -47,7 +74,7 @@ class _HomeAndroidState extends State<HomeAndroid> {
     );
   }
 
-  Widget _buildTextField(String label) {
+  Widget _buildTextField(String label, String value) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -60,6 +87,8 @@ class _HomeAndroidState extends State<HomeAndroid> {
           hintText: label,
           border: InputBorder.none,
         ),
+        readOnly: true,
+        controller: TextEditingController(text: value),
       ),
     );
   }
@@ -131,12 +160,15 @@ class _HomeAndroidState extends State<HomeAndroid> {
           titlesData: FlTitlesData(
             show: true,
             bottomTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) {
-                return Text(
-                  (value + 1).toInt().toString(),
-                  style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 14),
-                );
-              }),
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  return Text(
+                    (value + 1).toInt().toString(),
+                    style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 14),
+                  );
+                },
+              ),
             ),
             topTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
