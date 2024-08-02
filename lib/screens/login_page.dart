@@ -16,13 +16,11 @@ class LoginPage extends StatelessWidget {
                 child: CircleAvatar(
                   radius: 55,
                   backgroundColor: Colors.white,
-                  child: Text(
-                    'Logo',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.lightBlueAccent,
-                    ),
+                  child: Image.asset(
+                    'assets/images/logo_health.png',
+                    fit: BoxFit.contain,
+                    height: 390,
+                    width: 390,
                   ),
                 ),
               ),
@@ -67,7 +65,8 @@ class LoginPage extends StatelessWidget {
                             Navigator.pushReplacementNamed(context, '/home');
                           },
                           style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.lightBlueAccent,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Colors.lightBlueAccent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.0),
                             ),

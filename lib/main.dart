@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:health_water/screens/home/home_android.dart';
 import 'package:health_water/screens/home/splash_screen.dart';
 import 'package:health_water/screens/login_page.dart';
-import 'package:health_water/screens/home/edit_screen.dart'; // Importe a tela de edição
+import 'package:health_water/screens/home/edit_screen.dart';
+import 'package:health_water/screens/home/input_screen.dart'; // Importe a tela de entrada
 
 void main() {
   runApp(HealthWaterApp());
@@ -20,7 +21,8 @@ class HealthWaterApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomeAndroid(),
-        '/edit': (context) => EditScreen(), // Adicione a rota para a tela de edição
+        '/edit': (context) => EditScreen(),
+        '/input': (context) => InputScreen(), // Adicione a rota para a tela de entrada
       },
     );
   }

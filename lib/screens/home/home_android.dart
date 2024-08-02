@@ -7,65 +7,114 @@ class HomeAndroid extends StatefulWidget {
 }
 
 class _HomeAndroidState extends State<HomeAndroid> {
-  String _nome = 'Seu Nome';
-  double _altura = 1.75;
-  double _peso = 70.0;
-  double waterPercentage = 50;
+  late String _nome;
+  late double _altura;
+  late double _peso;
+  late String _sexo;
+  late double _waterIntake;
+  double _currentWaterIntake = 0.0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    _nome = args['nome'];
+    _altura = args['altura'];
+    _peso = args['peso'];
+    _sexo = args['sexo'];
+
+    _waterIntake = _calculateWaterIntake(_peso, _sexo);
+  }
+
+  double _calculateWaterIntake(double peso, String sexo) {
+    if (sexo == 'Masculino') {
+      return peso * 35; // Exemplo: 35 ml por kg para homens
+    } else {
+      return peso * 31; // Exemplo: 31 ml por kg para mulheres
+    }
+  }
+
+  void _addWater() {
+    setState(() {
+      _currentWaterIntake += 200;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    double percentage = (_currentWaterIntake / _waterIntake) * 100;
+    double totalGoal = _waterIntake;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Health Water'),
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE0F7FA),
+              Color(0xFFB2EBF2),
+            ],
+          ),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              CircleAvatar(
-                radius: 50,
-                backgroundColor: Colors.cyan,
-                child: Icon(
-                  Icons.person,
-                  size: 80,
-                  color: Colors.white,
-                ),
+              _buildLineChart(),
+              SizedBox(height: 32),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: CircularProgressIndicator(
+                      value: percentage / 100,
+                      strokeWidth: 10,
+                      backgroundColor: Colors.cyan.shade100,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${_currentWaterIntake.toStringAsFixed(0)} ml',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'de ${totalGoal.toStringAsFixed(0)} ml',
+                        style: TextStyle(fontSize: 16, color: Colors.cyan),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-              _buildTextField('Nome', _nome),
-              SizedBox(height: 8),
-              _buildTextField('Altura', _altura.toString()),
-              SizedBox(height: 8),
-              _buildTextField('Peso', _peso.toString()),
               SizedBox(height: 32),
-              _buildPercentageIndicator(),
-              SizedBox(height: 32),
-              _buildBarChart(),
-              SizedBox(height: 20),
+              FloatingActionButton(
+                onPressed: _addWater,
+                child: Icon(Icons.local_drink),
+              ),
+              Spacer(), // Adiciona espaço flexível antes do botão de edição
               ElevatedButton(
-                onPressed: () async {
-                  final result = await Navigator.pushNamed(
-                    context,
-                    '/edit',
-                    arguments: {
-                      'nome': _nome,
-                      'altura': _altura,
-                      'peso': _peso,
-                    },
-                  );
-                  if (result != null) {
-                    setState(() {
-                      var data = result as 
-                  Map<String, dynamic>;
-                      _nome = data['nome'];
-                      _altura = data['altura'];
-                      _peso = data['peso'];
-                    });
-                  }
+                onPressed: () {
+                  Navigator.pushNamed(context, '/edit', arguments: {
+                    'nome': _nome,
+                    'altura': _altura,
+                    'peso': _peso,
+                    'sexo': _sexo,
+                  });
                 },
                 child: Text('Editar Informações'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.cyan,
+                  textStyle: TextStyle(fontSize: 18),
+                ),
               ),
             ],
           ),
@@ -74,57 +123,17 @@ class _HomeAndroidState extends State<HomeAndroid> {
     );
   }
 
-  Widget _buildTextField(String label, String value) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.cyan, width: 2),
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: label,
-          border: InputBorder.none,
-        ),
-        readOnly: true,
-        controller: TextEditingController(text: value),
-      ),
-    );
-  }
+  Widget _buildLineChart() {
+    final spots = [
+      FlSpot(0, 500),
+      FlSpot(1, 700),
+      FlSpot(2, 600),
+      FlSpot(3, 800),
+      FlSpot(4, 750),
+      FlSpot(5, 900),
+      FlSpot(6, 1000),
+    ];
 
-  Widget _buildPercentageIndicator() {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 150,
-              height: 150,
-              child: CircularProgressIndicator(
-                value: waterPercentage / 100,
-                strokeWidth: 10,
-                backgroundColor: Colors.cyan.shade100,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
-              ),
-            ),
-            Text(
-              '$waterPercentage%',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Porcentagem de água para meta',
-          style: TextStyle(fontSize: 16, color: Colors.cyan),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBarChart() {
     return Container(
       height: 200,
       padding: EdgeInsets.all(16),
@@ -140,61 +149,64 @@ class _HomeAndroidState extends State<HomeAndroid> {
           ),
         ],
       ),
-      child: BarChart(
-        BarChartData(
-          alignment: BarChartAlignment.center,
-          maxY: 10,
-          barGroups: [
-            for (int i = 0; i < 7; i++)
-              BarChartGroupData(
-                x: i,
-                barRods: [
-                  BarChartRodData(
-                    toY: (i + 1).toDouble(),
-                    color: Colors.cyan,
-                    width: 15,
-                  ),
-                ],
-              ),
+      child: LineChart(
+        LineChartData(
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              color: Colors.cyan,
+              dotData: FlDotData(show: false),
+              belowBarData: BarAreaData(show: false),
+            ),
           ],
           titlesData: FlTitlesData(
-            show: true,
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
+                reservedSize: 40,
                 getTitlesWidget: (value, meta) {
-                  return Text(
-                    (value + 1).toInt().toString(),
-                    style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 14),
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(
+                      '${value.toInt()}d', // Exemplo: dia 1, dia 2, etc.
+                      style: TextStyle(color: Colors.cyan, fontSize: 14),
+                    ),
                   );
                 },
               ),
-            ),
-            topTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
             ),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                reservedSize: 28,
-                interval: 1,
+                reservedSize: 40,
+                interval: 200,
                 getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold, fontSize: 14),
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(
+                      '${value.toInt()} ml',
+                      style: TextStyle(color: Colors.cyan, fontSize: 14),
+                    ),
                   );
                 },
               ),
             ),
-            rightTitles: AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
           ),
-          borderData: FlBorderData(show: false),
-          gridData: FlGridData(show: false),
+          borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.cyan, width: 1),
+          ),
+          gridData: FlGridData(show: true),
         ),
       ),
     );
   }
 }
+
+
+
+
+
+
 

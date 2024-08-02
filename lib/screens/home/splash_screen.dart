@@ -10,37 +10,27 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 3), () {
-      Navigator.pushReplacementNamed(context, '/login');
+    Future.delayed(Duration(seconds: 3), () {
+      Navigator.pushReplacementNamed(context, '/input'); // Atualize a rota aqui
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            CircleAvatar(
-              radius: 60,
-              backgroundColor: Colors.lightBlueAccent,
-              child: CircleAvatar(
-                radius: 55,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.water, size: 50, color: Colors.lightBlueAccent),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Health Water',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.lightBlueAccent,
-              ),
-            ),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFFE0F7FA), // Azul mais claro
+              Color(0xFFB2EBF2),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Image.asset('assets/images/logo_health.png', height: 150),
         ),
       ),
     );
