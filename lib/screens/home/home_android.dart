@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class HomeAndroid extends StatefulWidget {
   @override
@@ -11,8 +10,8 @@ class _HomeAndroidState extends State<HomeAndroid> {
   late double _altura;
   late double _peso;
   late String _sexo;
-  late double _waterIntake;
-  double _currentWaterIntake = 0.0;
+  late double _ingestaoAgua;
+  double _ingestaoAtual = 0.0;
 
   @override
   void didChangeDependencies() {
@@ -23,10 +22,10 @@ class _HomeAndroidState extends State<HomeAndroid> {
     _peso = args['peso'];
     _sexo = args['sexo'];
 
-    _waterIntake = _calculateWaterIntake(_peso, _sexo);
+    _ingestaoAgua = _calcularIngestaoAgua(_peso, _sexo);
   }
 
-  double _calculateWaterIntake(double peso, String sexo) {
+  double _calcularIngestaoAgua(double peso, String sexo) {
     if (sexo == 'Masculino') {
       return peso * 35; // Exemplo: 35 ml por kg para homens
     } else {
@@ -34,16 +33,19 @@ class _HomeAndroidState extends State<HomeAndroid> {
     }
   }
 
-  void _addWater() {
+  void _adicionarAgua() {
     setState(() {
-      _currentWaterIntake += 200;
+      _ingestaoAtual += 200;
+      if (_ingestaoAtual > _ingestaoAgua) {
+        _ingestaoAtual = _ingestaoAgua;
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    double percentage = (_currentWaterIntake / _waterIntake) * 100;
-    double totalGoal = _waterIntake;
+    double porcentagem = (_ingestaoAtual / _ingestaoAgua) * 100;
+    double metaTotal = _ingestaoAgua;
 
     return Scaffold(
       appBar: AppBar(
@@ -65,55 +67,91 @@ class _HomeAndroidState extends State<HomeAndroid> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _buildLineChart(),
+              Text(
+                '${_ingestaoAgua.toStringAsFixed(0)} ml',
+                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Text(
+                'Esta é a quantidade que você $_nome deve beber ao longo do dia. Por favor, não esqueça de marcar!!!',
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                textAlign: TextAlign.center,
+              ),
               SizedBox(height: 32),
               Stack(
-                alignment: Alignment.center,
+                alignment: Alignment.bottomCenter,
                 children: [
-                  SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: CircularProgressIndicator(
-                      value: percentage / 100,
-                      strokeWidth: 10,
-                      backgroundColor: Colors.cyan.shade100,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+                  Container(
+                    height: 300,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.blue[100],
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${_currentWaterIntake.toStringAsFixed(0)} ml',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      height: 300 * ((100 - porcentagem) / 100),
+                      width: MediaQuery.of(context).size.width - 32, // Ajusta a largura do contêiner
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      Text(
-                        'de ${totalGoal.toStringAsFixed(0)} ml',
-                        style: TextStyle(fontSize: 16, color: Colors.cyan),
-                      ),
-                    ],
+                    ),
+                  ),
+                  Positioned(
+                    top: 150,
+                    child: Column(
+                      children: [
+                        Text(
+                          '${_ingestaoAtual.toStringAsFixed(0)} ml',
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        Text(
+                          'de ${metaTotal.toStringAsFixed(0)} ml',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
               SizedBox(height: 32),
-              FloatingActionButton(
-                onPressed: _addWater,
-                child: Icon(Icons.local_drink),
+              ElevatedButton(
+                onPressed: _adicionarAgua,
+                child: Text('+ BEBER'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.cyan,
+                  textStyle: TextStyle(fontSize: 18),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                ),
               ),
               Spacer(), // Adiciona espaço flexível antes do botão de edição
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/edit', arguments: {
+                onPressed: () async {
+                  final Map<String, dynamic>? updatedData = await Navigator.pushNamed(context, '/edit', arguments: {
                     'nome': _nome,
                     'altura': _altura,
                     'peso': _peso,
                     'sexo': _sexo,
                   });
+                  if (updatedData != null) {
+                    setState(() {
+                      _nome = updatedData['nome'];
+                      _altura = updatedData['altura'];
+                      _peso = updatedData['peso'];
+                      _sexo = updatedData['sexo'];
+                      _ingestaoAgua = _calcularIngestaoAgua(_peso, _sexo);
+                      _ingestaoAtual = 0.0; // Reset ingestão de água ao editar
+                    });
+                  }
                 },
                 child: Text('Editar Informações'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
                   textStyle: TextStyle(fontSize: 18),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
               ),
             ],
@@ -122,91 +160,7 @@ class _HomeAndroidState extends State<HomeAndroid> {
       ),
     );
   }
-
-  Widget _buildLineChart() {
-    final spots = [
-      FlSpot(0, 500),
-      FlSpot(1, 700),
-      FlSpot(2, 600),
-      FlSpot(3, 800),
-      FlSpot(4, 750),
-      FlSpot(5, 900),
-      FlSpot(6, 1000),
-    ];
-
-    return Container(
-      height: 200,
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: LineChart(
-        LineChartData(
-          lineBarsData: [
-            LineChartBarData(
-              spots: spots,
-              isCurved: true,
-              color: Colors.cyan,
-              dotData: FlDotData(show: false),
-              belowBarData: BarAreaData(show: false),
-            ),
-          ],
-          titlesData: FlTitlesData(
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                getTitlesWidget: (value, meta) {
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: Text(
-                      '${value.toInt()}d', // Exemplo: dia 1, dia 2, etc.
-                      style: TextStyle(color: Colors.cyan, fontSize: 14),
-                    ),
-                  );
-                },
-              ),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 40,
-                interval: 200,
-                getTitlesWidget: (value, meta) {
-                  return SideTitleWidget(
-                    axisSide: meta.axisSide,
-                    child: Text(
-                      '${value.toInt()} ml',
-                      style: TextStyle(color: Colors.cyan, fontSize: 14),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border.all(color: Colors.cyan, width: 1),
-          ),
-          gridData: FlGridData(show: true),
-        ),
-      ),
-    );
-  }
 }
-
-
-
-
 
 
 

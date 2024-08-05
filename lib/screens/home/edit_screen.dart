@@ -18,7 +18,7 @@ class _EditScreenState extends State<EditScreen> {
     _nomeController = TextEditingController(text: args['nome']);
     _alturaController = TextEditingController(text: args['altura'].toString());
     _pesoController = TextEditingController(text: args['peso'].toString());
-    _sexo = args['sexo'];
+    _sexo = args['sexo'] ?? 'Masculino';
   }
 
   @override
@@ -41,15 +41,14 @@ class _EditScreenState extends State<EditScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              Color(0xFFE0F7FA),
-              Color(0xFFB2EBF2),
+              Color(0xFFB3E5FC), // Cor inicial do gradiente
+              Color(0xFF0288D1), // Cor final do gradiente
             ],
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: _nomeController,
@@ -65,7 +64,6 @@ class _EditScreenState extends State<EditScreen> {
                 decoration: InputDecoration(labelText: 'Peso'),
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 20),
               DropdownButton<String>(
                 value: _sexo,
                 onChanged: (String? newValue) {
@@ -73,7 +71,7 @@ class _EditScreenState extends State<EditScreen> {
                     _sexo = newValue!;
                   });
                 },
-                items: <String>['Masculino', 'Feminino']
+                items: <String>['Masculino', 'Feminino', 'Outro']
                     .map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
@@ -100,6 +98,9 @@ class _EditScreenState extends State<EditScreen> {
     );
   }
 }
+
+
+
 
 
 
