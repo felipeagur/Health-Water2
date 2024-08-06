@@ -85,7 +85,7 @@ class _HomeAndroidState extends State<HomeAndroid> {
                     height: 300,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.blue[100],
+                      color: const Color.fromARGB(255, 96, 184, 255),
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
@@ -95,7 +95,7 @@ class _HomeAndroidState extends State<HomeAndroid> {
                       height: 300 * ((100 - porcentagem) / 100),
                       width: MediaQuery.of(context).size.width - 32, // Ajusta a largura do contêiner
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: const Color.fromARGB(255, 19, 92, 152),
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
@@ -122,7 +122,7 @@ class _HomeAndroidState extends State<HomeAndroid> {
                 onPressed: _adicionarAgua,
                 child: Text('+ BEBER'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
+                  backgroundColor: const Color.fromARGB(255, 9, 226, 255),
                   textStyle: TextStyle(fontSize: 18),
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
@@ -130,26 +130,16 @@ class _HomeAndroidState extends State<HomeAndroid> {
               Spacer(), // Adiciona espaço flexível antes do botão de edição
               ElevatedButton(
                 onPressed: () async {
-                  final Map<String, dynamic>? updatedData = await Navigator.pushNamed(context, '/edit', arguments: {
+                  final  updatedData = await Navigator.pushNamed(context, '/edit', arguments: {
                     'nome': _nome,
                     'altura': _altura,
                     'peso': _peso,
                     'sexo': _sexo,
                   });
-                  if (updatedData != null) {
-                    setState(() {
-                      _nome = updatedData['nome'];
-                      _altura = updatedData['altura'];
-                      _peso = updatedData['peso'];
-                      _sexo = updatedData['sexo'];
-                      _ingestaoAgua = _calcularIngestaoAgua(_peso, _sexo);
-                      _ingestaoAtual = 0.0; // Reset ingestão de água ao editar
-                    });
-                  }
                 },
                 child: Text('Editar Informações'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
+                  backgroundColor: const Color.fromARGB(255, 0, 147, 167),
                   textStyle: TextStyle(fontSize: 18),
                   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),

@@ -130,7 +130,7 @@ class _InputScreenState extends State<InputScreen> {
                 },
                 child: Text('Continuar'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan, // Usar backgroundColor em vez de primary
+                  backgroundColor: const Color.fromARGB(255, 0, 116, 131), // Usar backgroundColor em vez de primary
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
                   ),
